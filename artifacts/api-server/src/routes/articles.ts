@@ -21,6 +21,7 @@ async function getArticleWithCategory(id: number) {
       summary: articlesTable.summary,
       content: articlesTable.content,
       imageUrl: articlesTable.imageUrl,
+      videoUrl: articlesTable.videoUrl,
       categoryId: articlesTable.categoryId,
       categoryName: categoriesTable.name,
       author: articlesTable.author,
@@ -48,6 +49,7 @@ router.get("/featured", async (req, res) => {
         summary: articlesTable.summary,
         content: articlesTable.content,
         imageUrl: articlesTable.imageUrl,
+        videoUrl: articlesTable.videoUrl,
         categoryId: articlesTable.categoryId,
         categoryName: categoriesTable.name,
         author: articlesTable.author,
@@ -82,6 +84,7 @@ router.get("/latest", async (req, res) => {
         summary: articlesTable.summary,
         content: articlesTable.content,
         imageUrl: articlesTable.imageUrl,
+        videoUrl: articlesTable.videoUrl,
         categoryId: articlesTable.categoryId,
         categoryName: categoriesTable.name,
         author: articlesTable.author,
@@ -130,12 +133,13 @@ router.put("/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
 
-    const { title, summary, content, imageUrl, categoryId, author, isPublished, isFeatured } = req.body;
+    const { title, summary, content, imageUrl, videoUrl, categoryId, author, isPublished, isFeatured } = req.body;
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (title !== undefined) updateData.title = title;
     if (summary !== undefined) updateData.summary = summary;
     if (content !== undefined) updateData.content = content;
     if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
     if (categoryId !== undefined) updateData.categoryId = categoryId;
     if (author !== undefined) updateData.author = author;
     if (isPublished !== undefined) {
@@ -223,6 +227,7 @@ router.get("/", async (req, res) => {
           summary: articlesTable.summary,
           content: articlesTable.content,
           imageUrl: articlesTable.imageUrl,
+          videoUrl: articlesTable.videoUrl,
           categoryId: articlesTable.categoryId,
           categoryName: categoriesTable.name,
           author: articlesTable.author,
@@ -254,7 +259,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { title, summary, content, imageUrl, categoryId, author, isPublished, isFeatured } = req.body;
+    const { title, summary, content, imageUrl, videoUrl, categoryId, author, isPublished, isFeatured } = req.body;
     if (!title || !content || !author) {
       return res.status(400).json({ error: "title, content, author are required" });
     }
@@ -268,6 +273,7 @@ router.post("/", async (req, res) => {
         summary,
         content,
         imageUrl,
+        videoUrl,
         categoryId: categoryId || null,
         author,
         isPublished: isPublished ?? false,

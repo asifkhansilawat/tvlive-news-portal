@@ -11,6 +11,7 @@ export interface CreateArticleBody {
   summary?: string;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   categoryId?: number;
   author: string;
   isPublished?: boolean;

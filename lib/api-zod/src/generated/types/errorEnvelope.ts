@@ -6,6 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface Error {
+export interface ErrorEnvelope {
   error: string;
 }

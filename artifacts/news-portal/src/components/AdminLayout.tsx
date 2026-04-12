@@ -7,7 +7,8 @@ import {
   Tags, 
   LogOut,
   Menu,
-  X
+  X,
+  Newspaper
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -57,6 +58,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/categories" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-slate-800 hover:text-white transition-colors">
             <Tags size={18} />
             <span>Categories</span>
+          </Link>
+          
+          <Link href="/admin/epapers" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-slate-800 hover:text-white transition-colors">
+            <Newspaper size={18} />
+            <span>ePaper</span>
           </Link>
         </div>
         

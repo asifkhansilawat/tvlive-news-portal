@@ -13,6 +13,7 @@ export interface Article {
   summary?: string;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   categoryId?: number;
   categoryName?: string;
   author: string;

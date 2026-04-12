@@ -24,15 +24,21 @@ import type {
   CategoryList,
   CreateArticleBody,
   CreateCategoryBody,
-  Error,
+  CreateEpaperBody,
+  Epaper,
+  EpaperList,
+  ErrorEnvelope,
   GetAdminArticlesParams,
   GetArticlesParams,
+  GetEpapersParams,
   GetLatestArticlesParams,
   HealthStatus,
   LoginBody,
   LoginResponse,
   PublishBody,
   SuccessMessage,
+  UploadUrlRequest,
+  UploadUrlResponse,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -214,7 +220,7 @@ export function useGetArticles<
 }
 
 /**
- * @summary Create new article (admin)
+ * @summary Create new article
  */
 export const getCreateArticleUrl = () => {
   return `/api/articles`;
@@ -277,7 +283,7 @@ export type CreateArticleMutationBody = BodyType<CreateArticleBody>;
 export type CreateArticleMutationError = ErrorType<unknown>;
 
 /**
- * @summary Create new article (admin)
+ * @summary Create new article
  */
 export const useCreateArticle = <
   TError = ErrorType<unknown>,
@@ -300,7 +306,7 @@ export const useCreateArticle = <
 };
 
 /**
- * @summary Get featured/breaking news articles
+ * @summary Get featured articles
  */
 export const getGetFeaturedArticlesUrl = () => {
   return `/api/articles/featured`;
@@ -351,7 +357,7 @@ export type GetFeaturedArticlesQueryResult = NonNullable<
 export type GetFeaturedArticlesQueryError = ErrorType<unknown>;
 
 /**
- * @summary Get featured/breaking news articles
+ * @summary Get featured articles
  */
 
 export function useGetFeaturedArticles<
@@ -494,7 +500,7 @@ export const getGetArticleQueryKey = (id: number) => {
 
 export const getGetArticleQueryOptions = <
   TData = Awaited<ReturnType<typeof getArticle>>,
-  TError = ErrorType<Error>,
+  TError = ErrorType<ErrorEnvelope>,
 >(
   id: number,
   options?: {
@@ -529,7 +535,7 @@ export const getGetArticleQueryOptions = <
 export type GetArticleQueryResult = NonNullable<
   Awaited<ReturnType<typeof getArticle>>
 >;
-export type GetArticleQueryError = ErrorType<Error>;
+export type GetArticleQueryError = ErrorType<ErrorEnvelope>;
 
 /**
  * @summary Get article by ID
@@ -537,7 +543,7 @@ export type GetArticleQueryError = ErrorType<Error>;
 
 export function useGetArticle<
   TData = Awaited<ReturnType<typeof getArticle>>,
-  TError = ErrorType<Error>,
+  TError = ErrorType<ErrorEnvelope>,
 >(
   id: number,
   options?: {
@@ -559,7 +565,7 @@ export function useGetArticle<
 }
 
 /**
- * @summary Update article (admin)
+ * @summary Update article
  */
 export const getUpdateArticleUrl = (id: number) => {
   return `/api/articles/${id}`;
@@ -623,7 +629,7 @@ export type UpdateArticleMutationBody = BodyType<CreateArticleBody>;
 export type UpdateArticleMutationError = ErrorType<unknown>;
 
 /**
- * @summary Update article (admin)
+ * @summary Update article
  */
 export const useUpdateArticle = <
   TError = ErrorType<unknown>,
@@ -646,7 +652,7 @@ export const useUpdateArticle = <
 };
 
 /**
- * @summary Delete article (admin)
+ * @summary Delete article
  */
 export const getDeleteArticleUrl = (id: number) => {
   return `/api/articles/${id}`;
@@ -707,7 +713,7 @@ export type DeleteArticleMutationResult = NonNullable<
 export type DeleteArticleMutationError = ErrorType<unknown>;
 
 /**
- * @summary Delete article (admin)
+ * @summary Delete article
  */
 export const useDeleteArticle = <
   TError = ErrorType<unknown>,
@@ -892,7 +898,7 @@ export function useGetCategories<
 }
 
 /**
- * @summary Create category (admin)
+ * @summary Create category
  */
 export const getCreateCategoryUrl = () => {
   return `/api/categories`;
@@ -955,7 +961,7 @@ export type CreateCategoryMutationBody = BodyType<CreateCategoryBody>;
 export type CreateCategoryMutationError = ErrorType<unknown>;
 
 /**
- * @summary Create category (admin)
+ * @summary Create category
  */
 export const useCreateCategory = <
   TError = ErrorType<unknown>,
@@ -1169,7 +1175,7 @@ export const adminLogin = async (
 };
 
 export const getAdminLoginMutationOptions = <
-  TError = ErrorType<Error>,
+  TError = ErrorType<ErrorEnvelope>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1210,13 +1216,13 @@ export type AdminLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminLogin>>
 >;
 export type AdminLoginMutationBody = BodyType<LoginBody>;
-export type AdminLoginMutationError = ErrorType<Error>;
+export type AdminLoginMutationError = ErrorType<ErrorEnvelope>;
 
 /**
  * @summary Admin login
  */
 export const useAdminLogin = <
-  TError = ErrorType<Error>,
+  TError = ErrorType<ErrorEnvelope>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1234,3 +1240,530 @@ export const useAdminLogin = <
 > => {
   return useMutation(getAdminLoginMutationOptions(options));
 };
+
+/**
+ * @summary List all epapers
+ */
+export const getGetEpapersUrl = (params?: GetEpapersParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/epapers?${stringifiedParams}`
+    : `/api/epapers`;
+};
+
+export const getEpapers = async (
+  params?: GetEpapersParams,
+  options?: RequestInit,
+): Promise<EpaperList> => {
+  return customFetch<EpaperList>(getGetEpapersUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetEpapersQueryKey = (params?: GetEpapersParams) => {
+  return [`/api/epapers`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetEpapersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEpapers>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetEpapersParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getEpapers>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEpapersQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpapers>>> = ({
+    signal,
+  }) => getEpapers(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEpapers>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetEpapersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEpapers>>
+>;
+export type GetEpapersQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all epapers
+ */
+
+export function useGetEpapers<
+  TData = Awaited<ReturnType<typeof getEpapers>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetEpapersParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getEpapers>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetEpapersQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create epaper
+ */
+export const getCreateEpaperUrl = () => {
+  return `/api/epapers`;
+};
+
+export const createEpaper = async (
+  createEpaperBody: CreateEpaperBody,
+  options?: RequestInit,
+): Promise<Epaper> => {
+  return customFetch<Epaper>(getCreateEpaperUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createEpaperBody),
+  });
+};
+
+export const getCreateEpaperMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEpaper>>,
+    TError,
+    { data: BodyType<CreateEpaperBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEpaper>>,
+  TError,
+  { data: BodyType<CreateEpaperBody> },
+  TContext
+> => {
+  const mutationKey = ["createEpaper"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEpaper>>,
+    { data: BodyType<CreateEpaperBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createEpaper(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEpaperMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createEpaper>>
+>;
+export type CreateEpaperMutationBody = BodyType<CreateEpaperBody>;
+export type CreateEpaperMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create epaper
+ */
+export const useCreateEpaper = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEpaper>>,
+    TError,
+    { data: BodyType<CreateEpaperBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createEpaper>>,
+  TError,
+  { data: BodyType<CreateEpaperBody> },
+  TContext
+> => {
+  return useMutation(getCreateEpaperMutationOptions(options));
+};
+
+/**
+ * @summary Delete epaper
+ */
+export const getDeleteEpaperUrl = (id: number) => {
+  return `/api/epapers/${id}`;
+};
+
+export const deleteEpaper = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuccessMessage> => {
+  return customFetch<SuccessMessage>(getDeleteEpaperUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteEpaperMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEpaper>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteEpaper>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteEpaper"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteEpaper>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteEpaper(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteEpaperMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteEpaper>>
+>;
+
+export type DeleteEpaperMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete epaper
+ */
+export const useDeleteEpaper = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEpaper>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteEpaper>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteEpaperMutationOptions(options));
+};
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const getRequestUploadUrlUrl = () => {
+  return `/api/storage/uploads/request-url`;
+};
+
+export const requestUploadUrl = async (
+  uploadUrlRequest: UploadUrlRequest,
+  options?: RequestInit,
+): Promise<UploadUrlResponse> => {
+  return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(uploadUrlRequest),
+  });
+};
+
+export const getRequestUploadUrlMutationOptions = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  const mutationKey = ["requestUploadUrl"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    { data: BodyType<UploadUrlRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestUploadUrl(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestUploadUrlMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestUploadUrl>>
+>;
+export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>;
+export type RequestUploadUrlMutationError = ErrorType<ErrorEnvelope>;
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <
+  TError = ErrorType<ErrorEnvelope>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  return useMutation(getRequestUploadUrlMutationOptions(options));
+};
+
+/**
+ * @summary Serve a public asset
+ */
+export const getGetPublicObjectUrl = (filePath: string) => {
+  return `/api/storage/public-objects/${filePath}`;
+};
+
+export const getPublicObject = async (
+  filePath: string,
+  options?: RequestInit,
+): Promise<Blob> => {
+  return customFetch<Blob>(getGetPublicObjectUrl(filePath), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetPublicObjectQueryKey = (filePath: string) => {
+  return [`/api/storage/public-objects/${filePath}`] as const;
+};
+
+export const getGetPublicObjectQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPublicObject>>,
+  TError = ErrorType<unknown>,
+>(
+  filePath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPublicObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetPublicObjectQueryKey(filePath);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicObject>>> = ({
+    signal,
+  }) => getPublicObject(filePath, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!filePath,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPublicObject>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetPublicObjectQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPublicObject>>
+>;
+export type GetPublicObjectQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Serve a public asset
+ */
+
+export function useGetPublicObject<
+  TData = Awaited<ReturnType<typeof getPublicObject>>,
+  TError = ErrorType<unknown>,
+>(
+  filePath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPublicObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetPublicObjectQueryOptions(filePath, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Serve an object entity
+ */
+export const getGetStorageObjectUrl = (objectPath: string) => {
+  return `/api/storage/objects/${objectPath}`;
+};
+
+export const getStorageObject = async (
+  objectPath: string,
+  options?: RequestInit,
+): Promise<Blob> => {
+  return customFetch<Blob>(getGetStorageObjectUrl(objectPath), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetStorageObjectQueryKey = (objectPath: string) => {
+  return [`/api/storage/objects/${objectPath}`] as const;
+};
+
+export const getGetStorageObjectQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStorageObject>>,
+  TError = ErrorType<unknown>,
+>(
+  objectPath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStorageObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStorageObjectQueryKey(objectPath);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStorageObject>>
+  > = ({ signal }) =>
+    getStorageObject(objectPath, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!objectPath,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStorageObject>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetStorageObjectQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStorageObject>>
+>;
+export type GetStorageObjectQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Serve an object entity
+ */
+
+export function useGetStorageObject<
+  TData = Awaited<ReturnType<typeof getStorageObject>>,
+  TError = ErrorType<unknown>,
+>(
+  objectPath: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getStorageObject>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetStorageObjectQueryOptions(objectPath, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

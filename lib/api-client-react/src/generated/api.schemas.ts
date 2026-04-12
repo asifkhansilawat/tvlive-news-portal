@@ -16,6 +16,7 @@ export interface Article {
   summary?: string;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   categoryId?: number;
   categoryName?: string;
   author: string;
@@ -37,6 +38,7 @@ export interface CreateArticleBody {
   summary?: string;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   categoryId?: number;
   author: string;
   isPublished?: boolean;
@@ -74,6 +76,35 @@ export interface AdminStats {
   recentArticles: Article[];
 }
 
+export interface Epaper {
+  id: number;
+  title: string;
+  edition: string;
+  fileUrl: string;
+  thumbnailUrl?: string;
+  pageCount?: number;
+  fileSize?: string;
+  isPublished: boolean;
+  publishDate: string;
+  createdAt: string;
+}
+
+export interface EpaperList {
+  epapers: Epaper[];
+  total: number;
+}
+
+export interface CreateEpaperBody {
+  title: string;
+  edition?: string;
+  fileUrl: string;
+  thumbnailUrl?: string;
+  pageCount?: number;
+  fileSize?: string;
+  isPublished?: boolean;
+  publishDate?: string;
+}
+
 export interface LoginBody {
   username: string;
   password: string;
@@ -90,7 +121,22 @@ export interface SuccessMessage {
   message: string;
 }
 
-export interface Error {
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
+export interface ErrorEnvelope {
   error: string;
 }
 
@@ -119,3 +165,8 @@ export const GetAdminArticlesStatus = {
   published: "published",
   all: "all",
 } as const;
+
+export type GetEpapersParams = {
+  limit?: number;
+  offset?: number;
+};

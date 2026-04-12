@@ -36,6 +36,7 @@ export const GetArticlesResponse = zod.object({
       summary: zod.string().optional(),
       content: zod.string(),
       imageUrl: zod.string().optional(),
+      videoUrl: zod.string().optional(),
       categoryId: zod.number().optional(),
       categoryName: zod.string().optional(),
       author: zod.string(),
@@ -51,13 +52,14 @@ export const GetArticlesResponse = zod.object({
 });
 
 /**
- * @summary Create new article (admin)
+ * @summary Create new article
  */
 export const CreateArticleBody = zod.object({
   title: zod.string(),
   summary: zod.string().optional(),
   content: zod.string(),
   imageUrl: zod.string().optional(),
+  videoUrl: zod.string().optional(),
   categoryId: zod.number().optional(),
   author: zod.string(),
   isPublished: zod.boolean().optional(),
@@ -65,7 +67,7 @@ export const CreateArticleBody = zod.object({
 });
 
 /**
- * @summary Get featured/breaking news articles
+ * @summary Get featured articles
  */
 export const GetFeaturedArticlesResponse = zod.object({
   articles: zod.array(
@@ -76,6 +78,7 @@ export const GetFeaturedArticlesResponse = zod.object({
       summary: zod.string().optional(),
       content: zod.string(),
       imageUrl: zod.string().optional(),
+      videoUrl: zod.string().optional(),
       categoryId: zod.number().optional(),
       categoryName: zod.string().optional(),
       author: zod.string(),
@@ -108,6 +111,7 @@ export const GetLatestArticlesResponse = zod.object({
       summary: zod.string().optional(),
       content: zod.string(),
       imageUrl: zod.string().optional(),
+      videoUrl: zod.string().optional(),
       categoryId: zod.number().optional(),
       categoryName: zod.string().optional(),
       author: zod.string(),
@@ -136,6 +140,7 @@ export const GetArticleResponse = zod.object({
   summary: zod.string().optional(),
   content: zod.string(),
   imageUrl: zod.string().optional(),
+  videoUrl: zod.string().optional(),
   categoryId: zod.number().optional(),
   categoryName: zod.string().optional(),
   author: zod.string(),
@@ -148,7 +153,7 @@ export const GetArticleResponse = zod.object({
 });
 
 /**
- * @summary Update article (admin)
+ * @summary Update article
  */
 export const UpdateArticleParams = zod.object({
   id: zod.coerce.number(),
@@ -159,6 +164,7 @@ export const UpdateArticleBody = zod.object({
   summary: zod.string().optional(),
   content: zod.string(),
   imageUrl: zod.string().optional(),
+  videoUrl: zod.string().optional(),
   categoryId: zod.number().optional(),
   author: zod.string(),
   isPublished: zod.boolean().optional(),
@@ -172,6 +178,7 @@ export const UpdateArticleResponse = zod.object({
   summary: zod.string().optional(),
   content: zod.string(),
   imageUrl: zod.string().optional(),
+  videoUrl: zod.string().optional(),
   categoryId: zod.number().optional(),
   categoryName: zod.string().optional(),
   author: zod.string(),
@@ -184,7 +191,7 @@ export const UpdateArticleResponse = zod.object({
 });
 
 /**
- * @summary Delete article (admin)
+ * @summary Delete article
  */
 export const DeleteArticleParams = zod.object({
   id: zod.coerce.number(),
@@ -214,6 +221,7 @@ export const PublishArticleResponse = zod.object({
   summary: zod.string().optional(),
   content: zod.string(),
   imageUrl: zod.string().optional(),
+  videoUrl: zod.string().optional(),
   categoryId: zod.number().optional(),
   categoryName: zod.string().optional(),
   author: zod.string(),
@@ -241,7 +249,7 @@ export const GetCategoriesResponse = zod.object({
 });
 
 /**
- * @summary Create category (admin)
+ * @summary Create category
  */
 export const CreateCategoryBody = zod.object({
   name: zod.string(),
@@ -265,6 +273,7 @@ export const GetAdminStatsResponse = zod.object({
       summary: zod.string().optional(),
       content: zod.string(),
       imageUrl: zod.string().optional(),
+      videoUrl: zod.string().optional(),
       categoryId: zod.number().optional(),
       categoryName: zod.string().optional(),
       author: zod.string(),
@@ -299,6 +308,7 @@ export const GetAdminArticlesResponse = zod.object({
       summary: zod.string().optional(),
       content: zod.string(),
       imageUrl: zod.string().optional(),
+      videoUrl: zod.string().optional(),
       categoryId: zod.number().optional(),
       categoryName: zod.string().optional(),
       author: zod.string(),
@@ -325,4 +335,95 @@ export const AdminLoginResponse = zod.object({
   success: zod.boolean(),
   token: zod.string().optional(),
   message: zod.string(),
+});
+
+/**
+ * @summary List all epapers
+ */
+export const getEpapersQueryLimitDefault = 20;
+export const getEpapersQueryOffsetDefault = 0;
+
+export const GetEpapersQueryParams = zod.object({
+  limit: zod.coerce.number().default(getEpapersQueryLimitDefault),
+  offset: zod.coerce.number().default(getEpapersQueryOffsetDefault),
+});
+
+export const GetEpapersResponse = zod.object({
+  epapers: zod.array(
+    zod.object({
+      id: zod.number(),
+      title: zod.string(),
+      edition: zod.string(),
+      fileUrl: zod.string(),
+      thumbnailUrl: zod.string().optional(),
+      pageCount: zod.number().optional(),
+      fileSize: zod.string().optional(),
+      isPublished: zod.boolean(),
+      publishDate: zod.coerce.date(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+  total: zod.number(),
+});
+
+/**
+ * @summary Create epaper
+ */
+export const CreateEpaperBody = zod.object({
+  title: zod.string(),
+  edition: zod.string().optional(),
+  fileUrl: zod.string(),
+  thumbnailUrl: zod.string().optional(),
+  pageCount: zod.number().optional(),
+  fileSize: zod.string().optional(),
+  isPublished: zod.boolean().optional(),
+  publishDate: zod.coerce.date().optional(),
+});
+
+/**
+ * @summary Delete epaper
+ */
+export const DeleteEpaperParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteEpaperResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+export const RequestUploadUrlBody = zod.object({
+  name: zod.string().min(1),
+  size: zod.number().min(1),
+  contentType: zod.string().min(1),
+});
+
+export const RequestUploadUrlResponse = zod.object({
+  uploadURL: zod.string().url(),
+  objectPath: zod.string(),
+  metadata: zod
+    .object({
+      name: zod.string().min(1),
+      size: zod.number().min(1),
+      contentType: zod.string().min(1),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Serve a public asset
+ */
+export const GetPublicObjectParams = zod.object({
+  filePath: zod.coerce.string(),
+});
+
+/**
+ * @summary Serve an object entity
+ */
+export const GetStorageObjectParams = zod.object({
+  objectPath: zod.coerce.string(),
 });
