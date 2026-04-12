@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "News Portal"
+version = "1.0.0"
+id = "artifacts/news-portal"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21440
+
+[services.development]
+run = "pnpm --filter @workspace/news-portal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/news-portal", "run", "build" ]
+publicDir = "artifacts/news-portal/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21440"
+BASE_PATH = "/"

@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: News Portal API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: articles
+    description: Article operations
+  - name: categories
+    description: Category operations
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +28,275 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /articles:
+    get:
+      operationId: getArticles
+      tags: [articles]
+      summary: List published articles
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleList"
+    post:
+      operationId: createArticle
+      tags: [articles]
+      summary: Create new article (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArticleBody"
+      responses:
+        "201":
+          description: Article created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /articles/featured:
+    get:
+      operationId: getFeaturedArticles
+      tags: [articles]
+      summary: Get featured/breaking news articles
+      responses:
+        "200":
+          description: Featured articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleList"
+
+  /articles/latest:
+    get:
+      operationId: getLatestArticles
+      tags: [articles]
+      summary: Get latest articles
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Latest articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleList"
+
+  /articles/{id}:
+    get:
+      operationId: getArticle
+      tags: [articles]
+      summary: Get article by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      operationId: updateArticle
+      tags: [articles]
+      summary: Update article (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArticleBody"
+      responses:
+        "200":
+          description: Article updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+    delete:
+      operationId: deleteArticle
+      tags: [articles]
+      summary: Delete article (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessage"
+
+  /articles/{id}/publish:
+    post:
+      operationId: publishArticle
+      tags: [articles]
+      summary: Publish or unpublish article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishBody"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryList"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create category (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryBody"
+      responses:
+        "201":
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/articles:
+    get:
+      operationId: getAdminArticles
+      tags: [admin]
+      summary: Get all articles for admin (including drafts)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, all]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: All articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleList"
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +307,203 @@ components:
       required:
         - status
 
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        categoryId:
+          type: integer
+        categoryName:
+          type: string
+        author:
+          type: string
+        isPublished:
+          type: boolean
+        isFeatured:
+          type: boolean
+        viewCount:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - slug
+        - content
+        - author
+        - isPublished
+        - isFeatured
+        - viewCount
+        - createdAt
+        - updatedAt
+
+    ArticleList:
+      type: object
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Article"
+        total:
+          type: integer
+      required:
+        - articles
+        - total
+
+    CreateArticleBody:
+      type: object
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        categoryId:
+          type: integer
+        author:
+          type: string
+        isPublished:
+          type: boolean
+        isFeatured:
+          type: boolean
+      required:
+        - title
+        - content
+        - author
+
+    PublishBody:
+      type: object
+      properties:
+        isPublished:
+          type: boolean
+        isFeatured:
+          type: boolean
+      required:
+        - isPublished
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        color:
+          type: string
+        articleCount:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+
+    CategoryList:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+      required:
+        - categories
+
+    CreateCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+      required:
+        - name
+
+    AdminStats:
+      type: object
+      properties:
+        totalArticles:
+          type: integer
+        publishedArticles:
+          type: integer
+        draftArticles:
+          type: integer
+        totalCategories:
+          type: integer
+        totalViews:
+          type: integer
+        recentArticles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Article"
+      required:
+        - totalArticles
+        - publishedArticles
+        - draftArticles
+        - totalCategories
+        - totalViews
+        - recentArticles
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        token:
+          type: string
+        message:
+          type: string
+      required:
+        - success
+        - message
+
+    SuccessMessage:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
