@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
   try {
     const { title, edition, fileUrl, thumbnailUrl, pageCount, fileSize, isPublished, publishDate } = req.body;
     if (!title || !fileUrl) {
-      return res.status(400).json({ error: "title and fileUrl are required" });
+      res.status(400).json({ error: "title and fileUrl are required" }); return;
     }
 
     const [epaper] = await db
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
     await db.delete(epapersTable).where(eq(epapersTable.id, id));
     res.json({ success: true, message: "Epaper deleted" });
   } catch (err) {

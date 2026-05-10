@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
   try {
     const { name, color } = req.body;
     if (!name) {
-      return res.status(400).json({ error: "name is required" });
+      res.status(400).json({ error: "name is required" }); return;
     }
     const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const [category] = await db

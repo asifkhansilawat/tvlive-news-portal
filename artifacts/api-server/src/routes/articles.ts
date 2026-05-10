@@ -111,10 +111,10 @@ router.get("/latest", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
 
     const article = await getArticleWithCategory(id);
-    if (!article) return res.status(404).json({ error: "Article not found" });
+    if (!article) { res.status(404).json({ error: "Article not found" }); return; }
 
     await db
       .update(articlesTable)
@@ -131,7 +131,7 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
 
     const { title, summary, content, imageUrl, videoUrl, categoryId, author, isPublished, isFeatured } = req.body;
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
@@ -150,7 +150,7 @@ router.put("/:id", async (req, res) => {
 
     await db.update(articlesTable).set(updateData).where(eq(articlesTable.id, id));
     const article = await getArticleWithCategory(id);
-    if (!article) return res.status(404).json({ error: "Article not found" });
+    if (!article) { res.status(404).json({ error: "Article not found" }); return; }
     res.json(article);
   } catch (err) {
     req.log.error(err);
@@ -161,7 +161,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
 
     await db.delete(articlesTable).where(eq(articlesTable.id, id));
     res.json({ success: true, message: "Article deleted" });
@@ -174,7 +174,7 @@ router.delete("/:id", async (req, res) => {
 router.post("/:id/publish", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
 
     const { isPublished, isFeatured } = req.body;
     const updateData: Record<string, unknown> = { isPublished, updatedAt: new Date() };
@@ -183,7 +183,7 @@ router.post("/:id/publish", async (req, res) => {
 
     await db.update(articlesTable).set(updateData).where(eq(articlesTable.id, id));
     const article = await getArticleWithCategory(id);
-    if (!article) return res.status(404).json({ error: "Article not found" });
+    if (!article) { res.status(404).json({ error: "Article not found" }); return; }
     res.json(article);
   } catch (err) {
     req.log.error(err);
@@ -261,7 +261,7 @@ router.post("/", async (req, res) => {
   try {
     const { title, summary, content, imageUrl, videoUrl, categoryId, author, isPublished, isFeatured } = req.body;
     if (!title || !content || !author) {
-      return res.status(400).json({ error: "title, content, author are required" });
+      res.status(400).json({ error: "title, content, author are required" }); return;
     }
 
     const slug = slugify(title);
