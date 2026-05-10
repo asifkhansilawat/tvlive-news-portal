@@ -6,7 +6,7 @@
   "framework": null,
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@3"
+      "runtime": "@v/node@3"
     }
   },
   "rewrites": [
