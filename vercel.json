@@ -4,11 +4,6 @@
   "installCommand": "npm install -g pnpm && pnpm install --frozen-lockfile=false",
   "outputDirectory": "artifacts/news-portal/dist",
   "framework": null,
-  "functions": {
-    "api/index.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
