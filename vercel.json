@@ -5,8 +5,7 @@
   "outputDirectory": "artifacts/news-portal/dist",
   "framework": null,
   "functions": {
-    "api/index.ts": {
-      "runt"runtime": "@vercel/node"    },
+    "api/index.ts": nt"runtime": "@vercel/node"    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
