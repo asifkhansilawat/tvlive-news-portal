@@ -1,49 +1,78 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# ============================================
+# .gitignore for Hindi News Portal Monorepo
+# ============================================
 
-# compiled output
-dist
-tmp
-out-tsc
+# ---- Compiled Output ----
+dist/
+tmp/
+out-tsc/
 *.tsbuildinfo
 .expo
 .expo-shared
+build/
 
-# dependencies
-node_modules
+# ---- Dependencies ----
+node_modules/
+.pnpm-store/
 
-# IDEs and editors
-/.idea
+# ---- Environment Variables (NEVER commit these!) ----
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# ---- IDEs and Editors ----
+.idea/
 .project
 .classpath
 .c9/
 *.launch
 .settings/
 *.sublime-workspace
-
-# IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# misc
-/.sass-cache
+# ---- OS Files ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
 /connect.lock
 /coverage
 /libpeerconnection.log
-npm-debug.log
-yarn-error.log
 testem.log
+
+# ---- Testing ----
+coverage/
+.nyc_output/
+
+# ---- Misc ----
+/.sass-cache
 /typings
+*.pem
+*.key
+service-account.json
+google-credentials.json
 
-# System Files
-.DS_Store
-Thumbs.db
-
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
+# ---- Replit Specific (DO NOT PUSH) ----
 .cache/
 .local/
+.replit
+.replitignore
+.agents/
+.replit-artifact/
+
+# ---- Cursor ----
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
