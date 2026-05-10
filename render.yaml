@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: tvlive-api-server
+    env: node
+    buildCommand: npm install -g pnpm && pnpm install --frozen-lockfile=false && pnpm run typecheck:libs && pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
