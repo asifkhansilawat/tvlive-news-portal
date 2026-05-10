@@ -6,10 +6,7 @@
   "framework": null,
   "functions": {
     "api/index.ts": {
-      "runtime"        "runtime": "@vercel/node"
-      "source": "/api/(.*)",
-      "destination": "/api/index.ts"
-    },
+      "runt"runtime": "@vercel/node"    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
