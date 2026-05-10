@@ -1,17 +1,10 @@
 {
-      "version": 2,
-      "buildCommand": "pnpm run build",
-      "installCommand": "npm install -g pnpm && pnpm install --frozen-lockfile=false",
-      "outputDirectory": "artifacts/news-portal/dist",
-      "functions": {
-              "api/index.ts": {
-                        "runtime": "nodejs20.x"
-              }
-      },
-      "routes": [
-              {
-                        "source": "/((?!api/).*)",
-                        "destination": "/index.html"
-              }
-      ]
+        "version": 2,
+        "buildCommand": "pnpm run build",
+        "installCommand": "npm install -g pnpm && pnpm install --frozen-lockfile=false",
+        "outputDirectory": "artifacts/news-portal/dist",
+        "rewrites": [
+                  { "source": "/api/(.*)", "destination": "/api/index.ts" },
+                  { "source": "/((?!api/).*)", "destination": "/index.html" }
+        ]
 }
