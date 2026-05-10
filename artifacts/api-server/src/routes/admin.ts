@@ -4,8 +4,8 @@ import { eq, desc, and, sql } from "drizzle-orm";
 
 const router = Router();
 
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "asifkhansilawat";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "honda@0090";
 
 router.post("/login", async (req, res) => {
   try {
