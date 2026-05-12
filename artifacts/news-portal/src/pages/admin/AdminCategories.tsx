@@ -15,16 +15,25 @@ export default function AdminCategories() {
   const createCategory = useCreateCategory();
   const [name, setName] = useState("");
   const [color, setColor] = useState(COLORS[0]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const categories = data?.categories || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+    setError(null);
+    setSuccess(false);
     createCategory.mutate({ data: { name, color } }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetCategoriesQueryKey() });
         setName("");
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      },
+      onError: (err: unknown) => {
+        setError(err instanceof Error ? err.message : "Category create nahi hui. Dobara try karein.");
       }
     });
   };
@@ -103,6 +112,13 @@ export default function AdminCategories() {
                 <span className="text-sm text-gray-500">{color}</span>
               </div>
             </div>
+
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
+            )}
+            {success && (
+              <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">✓ Category successfully banayi gayi!</p>
+            )}
 
             <button
               type="submit"

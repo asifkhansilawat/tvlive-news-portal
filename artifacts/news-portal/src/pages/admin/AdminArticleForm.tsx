@@ -31,6 +31,8 @@ function MediaUploader({
   const [uploadDone, setUploadDone] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -38,22 +40,18 @@ function MediaUploader({
     setUploadError(null);
     setUploadDone(false);
     try {
-      const metaRes = await fetch("/api/storage/uploads/request-url", {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${apiBase}/api/upload`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+        body: formData,
       });
-      if (!metaRes.ok) throw new Error("Failed to get upload URL");
-      const { uploadURL, objectPath } = await metaRes.json();
-
-      const uploadRes = await fetch(uploadURL, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      if (!uploadRes.ok) throw new Error("Upload failed");
-
-      onChange(objectPath);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Upload failed (${res.status})`);
+      }
+      const { url } = await res.json();
+      onChange(url);
       setUploadDone(true);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
@@ -263,7 +261,7 @@ export default function AdminArticleForm() {
 
           {form.imageUrl && (
             <div className="relative rounded-lg overflow-hidden h-32 bg-gray-100">
-              <img src={form.imageUrl.startsWith("/objects/") ? `/api${form.imageUrl}` : form.imageUrl} alt="preview" className="w-full h-full object-cover" />
+              <img src={form.imageUrl.startsWith("/objects/") ? `${(import.meta.env.VITE_API_URL || "").replace(/\/$/, "")}/api${form.imageUrl}` : form.imageUrl.startsWith("/uploads/") ? `${(import.meta.env.VITE_API_URL || "").replace(/\/$/, "")}${form.imageUrl}` : form.imageUrl} alt="preview" className="w-full h-full object-cover" />
               <button type="button" onClick={() => setForm(p => ({ ...p, imageUrl: "" }))} className="absolute top-2 right-2 bg-black/50 rounded-full p-0.5 text-white hover:bg-black/70">
                 <X size={14} />
               </button>

@@ -18,6 +18,7 @@ import AdminArticles from "@/pages/admin/AdminArticles";
 import AdminArticleForm from "@/pages/admin/AdminArticleForm";
 import AdminCategories from "@/pages/admin/AdminCategories";
 import AdminEPapers from "@/pages/admin/AdminEPapers";
+import AdminPageBuilder from "@/pages/admin/AdminPageBuilder";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
                   <Route path="/admin/articles/:id/edit" component={AdminArticleForm} />
                   <Route path="/admin/categories" component={AdminCategories} />
                   <Route path="/admin/epapers" component={AdminEPapers} />
+                  <Route path="/admin/page-builder" component={AdminPageBuilder} />
                   <Route component={NotFound} />
                 </Switch>
               </AdminLayout>

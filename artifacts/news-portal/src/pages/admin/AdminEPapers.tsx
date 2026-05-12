@@ -35,21 +35,26 @@ function FileUploadField({
   const [done, setDone] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
+  const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true); setError(null); setDone(false);
     try {
-      const res = await fetch("/api/storage/uploads/request-url", {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${apiBase}/api/upload`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+        body: formData,
       });
-      if (!res.ok) throw new Error("Failed to get upload URL");
-      const { uploadURL, objectPath } = await res.json();
-      const up = await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-      if (!up.ok) throw new Error("Upload failed");
-      onUpload(objectPath);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Upload failed (${res.status})`);
+      }
+      const { url } = await res.json();
+      onUpload(url);
+      onChange(url);
       setDone(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
